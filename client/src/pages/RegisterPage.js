@@ -6,8 +6,23 @@ function RegisterPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
+  const [avatars, setAvatars] = useState({});
 
   const { register } = useAuth();
+
+  const handleFileChange = (event) => {
+    const uniqueId = Date.now();
+    setAvatars({
+      ...avatars,
+      [uniqueId]: event.target.files[0],
+    });
+  };
+
+  const handleRemoveImage = (event, avatarKey) => {
+    event.preventDefault();
+    delete avatars[avatarKey];
+    setAvatars({ ...avatars });
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -85,17 +100,37 @@ function RegisterPage() {
           </label>
         </div>
         <div className="input-container">
-          <label>
+          <label htmlFor="upload">
             Avatar
             <input
-              id="avatar"
+              id="upload"
               name="avatar"
               type="file"
               placeholder="Enter last name here"
+              onChange={handleFileChange}
               multiple
-              onChange={(event) => {}}
             />
           </label>
+          <div className="image-list-preview-container">
+            {Object.keys(avatars).map((avatarKey) => {
+              const file = avatars[avatarKey];
+              return (
+                <div key={avatarKey} className="image-preview-container">
+                  <img
+                    className="image-preview"
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                  />
+                  <button
+                    className="image-remove-button"
+                    onClick={(event) => handleRemoveImage(event, avatarKey)}
+                  >
+                    x
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
         <div className="form-actions">
           <button type="submit">Submit</button>
