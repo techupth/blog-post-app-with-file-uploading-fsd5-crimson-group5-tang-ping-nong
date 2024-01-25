@@ -59,6 +59,9 @@ function RegisterPage() {
       ...prevAvatar,
       [uniqueId]: selectedFiles,
     }));
+
+    // Clear the avatar selection after upload
+    event.target.value = null;
   };
 
   const handleRemoveImage = (event, avatarKey) => {
