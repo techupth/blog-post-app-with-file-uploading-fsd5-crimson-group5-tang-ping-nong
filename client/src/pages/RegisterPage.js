@@ -6,18 +6,39 @@ function RegisterPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
+  const [avatar, setAvatar] = useState({});
 
   const { register } = useAuth();
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = {
-      username,
-      password,
-      firstName,
-      lastName,
-    };
-    register(data);
+
+    const formData = new FormData();
+
+    formData.append("username", username);
+    formData.append("password", password);
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+
+    for (let avatarKey in avatar) {
+      formData.append("avatar", avatar[avatarKey]);
+    }
+
+    register(formData);
+  };
+
+  const handleFileChange = (event) => {
+    const uniqueId = Date.now();
+    setAvatar({
+      ...avatar,
+      [uniqueId]: event.target.files[0],
+    });
+  };
+
+  const handleRemoveImage = (event, avatarKey) => {
+    event.preventDefault();
+    delete avatar[avatarKey];
+    setAvatar({ ...avatar });
   };
 
   return (
@@ -93,9 +114,29 @@ function RegisterPage() {
               type="file"
               placeholder="Enter last name here"
               multiple
-              onChange={(event) => {}}
+              onChange={handleFileChange}
             />
           </label>
+          <div className="image-list-preview-container">
+            {Object.keys(avatar).map((avatarKey) => {
+              const file = avatar[avatarKey];
+              return (
+                <div key={avatarKey} className="image-preview-container">
+                  <img
+                    className="image-preview"
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                  />
+                  <button
+                    className="image-remove-button"
+                    onClick={(event) => handleRemoveImage(event, avatarKey)}
+                  >
+                    x
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
         <div className="form-actions">
           <button type="submit">Submit</button>
